@@ -26,13 +26,6 @@ class ConvNet(object):
     ## constructor to build the model for the traininig ##
     def __init__(self, **kwargs ):
 
-      # initialize all allowed keys to false
-
-      #if (self.dataset_training != False):
-      #    self.train_imgs_lab = Dataset.load_dataset(self.dataset_training)
-      #else: 
-      #    self.test_imgs_lab = Dataset.load_dataset(self.dataset_test)
-
       # store layers weight & bias
       self.weights = {
           'wc1' : tf.Variable(tf.random_normal([11, 11, 3            , 96 ], stddev = 0.01)),
@@ -84,8 +77,6 @@ class ConvNet(object):
       conv2    = self.conv2d( pool1, self.weights['wc2'], self.biases['bc2'], strides = 1 )
       pool2    = self.maxpool2d( conv2, k = 3, s = 2)
 
-      print pool2.get_shape().as_list()
-
       # Convolution Layer 3
       conv3    = self.conv2d( pool2, self.weights['wc3'], self.biases['bc3'], strides = 1 )
 
@@ -96,7 +87,6 @@ class ConvNet(object):
       conv5    = self.conv2d( conv4, self.weights['wc5'], self.biases['bc5'], strides = 1)
       pool5    = self.maxpool2d( conv5, k = 3, s = 2)
 
-      print pool5.get_shape().as_list()
       # FC5 : fully connectly layer 
       #pool_vec = tf.reshape(pool5, [pool5.get_shape().as_list()[0], -1]) 
      
@@ -123,27 +113,25 @@ logits       = net.alex_net()
 prediction   = tf.nn.softmax( logits )
 
 # Define loss and optimizer
-loss_pre      = tf.nn.softmax_cross_entropy_with_logits( logits = logits, labels = labels )
-loss      = tf.reduce_mean( loss_pre )
+loss_pre     = tf.nn.softmax_cross_entropy_with_logits( logits = logits, labels = labels )
+loss         = tf.reduce_mean( loss_pre )
 
 #optimizer    = tf.train.AdamOptimizer( learning_rate = LR )
 # optimizer    = tf.train.GradientDescentOptimizer( LR )
 # train_op     = optimizer.minimize(loss)
-train_op = tf.train.RMSPropOptimizer(0.001, 0.9).minimize(loss)
+train_op     = tf.train.RMSPropOptimizer(0.001, 0.9).minimize(loss)
 
 # Evaluate model
 #correct_pred = tf.equal( tf.argmax(prediction,1), tf.argmax(labels,1))
 correct_pred = tf.equal( tf.argmax(prediction,1), tf.argmax(labels,1))
 accuracy     = tf.reduce_mean( tf.cast(correct_pred, tf.float32))
 
-conf   = tf.ConfigProto( 
-                          gpu_options = tf.GPUOptions( allow_growth = True ) 
-                        )  
+conf         = tf.ConfigProto( gpu_options = tf.GPUOptions( allow_growth = True ) )  
 
 hnd_data_train = data.DataHandler()
-hnd_data_train.parse('/home/teq/Desktop/daxin_alexnet/train.txt')
+hnd_data_train.parse('/home/fensi/nas/ImageNet/train.txt')
 hnd_data_test  = data.DataHandler()
-hnd_data_test.parse('/home/teq/Desktop/daxin_alexnet/test.txt')
+hnd_data_test.parse('/home/fensi/nas/ImageNet/test.txt')
 
 # Start training
 with tf.Session( config = conf ) as sess:
@@ -159,10 +147,10 @@ with tf.Session( config = conf ) as sess:
     hnd_data_train.shuffle()
     display = 0
     for start in range( 1, hnd_data_train.num() - hnd_data_train.num()% batch_size, batch_size ):
-      end = start + batch_size
+      end              = start + batch_size
       batch_x, batch_y = hnd_data_train.load_data( start, end, crop_size = 227, train = True ) 
       batch_x /= 128.
-      s_batch_y = np.zeros( (end-start, 1000) )
+      s_batch_y        = np.zeros( (end-start, 1000) )
       for b in range( end-start ):
         s_batch_y[b,batch_y[b]] = 1
 
