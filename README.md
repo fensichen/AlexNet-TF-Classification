@@ -18,6 +18,7 @@ Example train.txt:
 
 /path/to/train/image4.png 0
 
+
 were the first column is the path and the second the class label.
 
 ### Requirements
@@ -26,10 +27,12 @@ were the first column is the path and the second the class label.
 	* numpy
 	* scipy
 
-The LRN layers have been removed.
 
 # Content
 	* data.py: Class with data loading and augmentation
 	* main.py: Class with graph definition of AlexNet 
 	* (finetune): to be added
+
 ## Note 
+	The LRN layers have been removed.
+
